@@ -13,15 +13,17 @@ const client = new Client({
 
 client.on('interactionCreate', async interaction => {
     if (!interaction.isChatInputCommand()) return
+    if (interaction.commandName !== 'idea') return
 
-    const { command } = interaction
-    console.log('mensaje recibido ', interaction.options.getString('content'))
-    if (command === 'idea') {
-        // request to Notion API
-        await axios.post('https://eoaumvngn9h999o.m.pipedream.net/', { 'title': interaction.options.getString('content')})
+    try {
+        await axios.post(process.env.URL, 
+            JSON.stringify({ 'title': interaction.options.getString('content') })
+        )
+    } catch (error) {
+        console.error(error.message)
     }
 
-    interaction.reply('Mensaje recibido')
+    await interaction.reply({ content: 'Mensaje recibido', ephemeral: true })
 })
 
 client.once('ready', () => {
